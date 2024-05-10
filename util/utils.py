@@ -21,6 +21,15 @@ def subShow3(IMG1, IMG2, IMG3):
     plt.axis('off')
     plt.show()
 
+# multiple inputs for the model
+def multi_input(w_img, o_img):
+    
+    w_0, o_0 = w_img, o_img
+    w_2, o_2 = w_0[:, ::2, ::2, :], o_0[:, ::2, ::2, :]
+    w_4, o_4 = w_0[:, ::4, ::4, :], o_0[:, ::4, ::4, :]
+    
+    return [w_0, w_2, w_4], [o_0, o_2, o_4]
+
 def save_svg(image_stack, domain, kind, path):
     # Define the path where you want to save the SVG files
     output_path = path
@@ -36,7 +45,18 @@ def save_svg(image_stack, domain, kind, path):
         svg_filename = os.path.join(output_path, f"{str(kind)}_{i:03d}_{str(domain)}.svg")
         plt.savefig(svg_filename, format='svg', bbox_inches='tight', pad_inches=0)
         plt.close()
-        
+
+def save_3_levels(image_list, output_path, domain, kind):
+    
+    for i in range(len(image_list)):
+        image = image_list[i]
+        plt.figure(figsize=(1.28, 1.28), dpi=300)  # Set figsize and dpi to match the 128x128 size
+        plt.imshow(image, cmap='gray')
+        plt.axis('off')
+        svg_filename = os.path.join(output_path, f"{str(kind)}_{i:03d}_{str(domain)}.svg")
+        plt.savefig(svg_filename, format='svg', bbox_inches='tight', pad_inches=0)
+    print('finish save')
+   
 def rescale(image_stack, MIN=0, MAX=1):
     # Rescale the whole stack
     if image_stack[0].max() != 1:

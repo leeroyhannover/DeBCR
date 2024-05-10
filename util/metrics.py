@@ -2,7 +2,8 @@
 import tensorflow as tf
 import numpy as np
 from skimage.metrics import peak_signal_noise_ratio
-from skimage.metrics import structural_similarity as ssim
+from skimage.metrics import structural_similarity
+from skimage.metrics import peak_signal_noise_ratio, structural_similarity
     
 def metrics(IMG1, IMG2):
     # input: IMG1, IMG2 - numpy arrays with shape [batch_size, height, width, channels]
