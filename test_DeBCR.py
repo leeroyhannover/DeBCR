@@ -14,7 +14,6 @@ from util.loss_func import *
 from util.metrics import *
 from util.data import *
 
-
 def test(path = './weights/2D_denoising/'):
     eval_model = model_m_rBCR()
     eval_model.compile(optimizer='adam', loss=loss_function_mimo, metrics=[metrics_func_mimo]) 
