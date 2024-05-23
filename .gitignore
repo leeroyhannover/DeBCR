@@ -1,5 +1,6 @@
 # notebooks
 *.ipynb
+.ipynb_checkpoints
 
 # weights
 # *ckpt*
@@ -10,3 +11,6 @@
 ./data/*
 
 *.npz
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
