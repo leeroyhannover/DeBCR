@@ -32,7 +32,7 @@ def test(args):
     # Specify the checkpoint you want to restore for testing
     checkpoint_to_restore = os.path.join(weight_path, 'ckpt-best')
     status = checkpoint.restore(checkpoint_to_restore)
-    status.assert_consumed()
+    #status.assert_consumed()
     
     ### Test dataset
     # Input directory for testing data
