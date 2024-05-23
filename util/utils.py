@@ -67,7 +67,85 @@ def save_1_levels(image_list, output_path, domain, kind, color='inferno'):
     plt.savefig(svg_filename, format='svg', bbox_inches='tight', pad_inches=0)
     
     print('finish save')
+    
+def save_grid_LM(pred_list, w_list, o_list, output_path, domain, NUM=5, color='inferno'):
+    num_images = NUM
+    random_indices = random.sample(range(len(w_list)), num_images)
+
+    fig, axes = plt.subplots(3, num_images, figsize=(num_images * 3, 9))
+    
+    for i, idx in enumerate(random_indices):
+        axes[0, i].imshow(w_list[idx], cmap=color)
+        axes[0, i].axis('off')
+        if i == 0:
+            axes[0, i].axis('on')
+            axes[0, i].set_ylabel('Input', fontsize=12, labelpad=10)
+            axes[0, i].yaxis.set_ticks([])  
+            axes[0, i].yaxis.set_ticklabels([])  
+            axes[0, i].xaxis.set_ticks([])  
+            axes[0, i].xaxis.set_ticklabels([]) 
+
+    for i, idx in enumerate(random_indices):
+        axes[1, i].imshow(pred_list[idx], cmap=color)
+        axes[1, i].axis('off')
+        if i == 0:
+            axes[1, i].axis('on')
+            axes[1, i].set_ylabel('Prediction', fontsize=12, labelpad=10)
+            axes[1, i].yaxis.set_ticks([])  
+            axes[1, i].yaxis.set_ticklabels([])  
+            axes[1, i].xaxis.set_ticks([])  
+            axes[1, i].xaxis.set_ticklabels([]) 
+
+    for i, idx in enumerate(random_indices):
+        axes[2, i].imshow(o_list[idx], cmap=color)
+        axes[2, i].axis('off')
+        if i == 0:
+            axes[2, i].axis('on')
+            axes[2, i].set_ylabel('Ground Truth', fontsize=12, labelpad=10)
+            axes[2, i].yaxis.set_ticks([])  
+            axes[2, i].yaxis.set_ticklabels([])  
+            axes[2, i].xaxis.set_ticks([])  
+            axes[2, i].xaxis.set_ticklabels([]) 
+    
+    plt.tight_layout()
+    svg_filename = os.path.join(output_path, f"{str(domain)}.png")
+    plt.savefig(svg_filename, bbox_inches='tight', pad_inches=0, dpi=96)
+    plt.close()
    
+def save_grid_EM(pred_list, w_list, output_path, domain, NUM=5, color='gray'):
+    
+    num_images = NUM
+    random_indices = random.sample(range(len(w_list)), num_images)
+    fig, axes = plt.subplots(2, num_images, figsize=(num_images * 2, 6))
+    
+    for i, idx in enumerate(random_indices):
+        axes[0, i].imshow(w_list[idx], cmap=color)
+        axes[0, i].axis('off')
+        if i == 0:
+            axes[0, i].axis('on')
+            axes[0, i].set_ylabel('Input', fontsize=12, labelpad=10)
+            axes[0, i].yaxis.set_ticks([])  
+            axes[0, i].yaxis.set_ticklabels([])  
+            axes[0, i].xaxis.set_ticks([])  
+            axes[0, i].xaxis.set_ticklabels([]) 
+
+    for i, idx in enumerate(random_indices):
+        axes[1, i].imshow(pred_list[idx], cmap=color)
+        axes[1, i].axis('off')
+        if i == 0:
+            axes[1, i].axis('on')
+            axes[1, i].set_ylabel('Prediction', fontsize=12, labelpad=10)
+            axes[1, i].yaxis.set_ticks([])  
+            axes[1, i].yaxis.set_ticklabels([])  
+            axes[1, i].xaxis.set_ticks([])  
+            axes[1, i].xaxis.set_ticklabels([]) 
+    
+    plt.tight_layout()
+    svg_filename = os.path.join(output_path, f"{str(domain)}.png")
+    plt.savefig(svg_filename, bbox_inches='tight', pad_inches=0, dpi=96)
+    plt.close()
+
+
 def rescale(image_stack, MIN=0, MAX=1):
     # Rescale the whole stack
     if image_stack[0].max() != 1:

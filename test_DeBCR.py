@@ -127,7 +127,7 @@ def test(args):
             X_test_patches, Y_test_patches = rescale(X_test_patches), rescale(Y_test_patches)
 
             X_test_list, Y_test_list = multi_input(X_test_patches, Y_test_patches)
-            
+
             pred_X_test_list = eval_model.predict(X_test_list)
             pred_Y_test_list = eval_model.predict(Y_test_list)
     else:
@@ -144,24 +144,12 @@ def test(args):
             os.makedirs(fig_path)
         
         if args.microscopy == 'LM':
-            NUM = random.randint(0, pred_test_list[0].shape[0]-1) 
-            pred_list_level = pred_test_list[0][NUM], pred_test_list[1][NUM], pred_test_list[2][NUM]
-            test_w_list_level = test_w_list[0][NUM], test_w_list[1][NUM], test_w_list[2][NUM]
-            test_o_list_level = test_o_list[0][NUM], test_o_list[1][NUM], test_o_list[2][NUM]
-            save_1_levels(pred_list_level, fig_path, str(args.task_type), 'pre')
-            save_1_levels(test_w_list_level, fig_path, str(args.task_type), 'low')
-            save_1_levels(test_o_list_level, fig_path, str(args.task_type), 'gt')
-            print('LM test results saved at:', NUM, fig_path)
-        elif args.microscopy == 'EM':
-            # NUM = random.randint(0, X_test_list[0].shape[0]-1) # 2999 for high_ET, 85 for low_ET
-            # NUM = 2999
-            NUM = random.randint(0, pred_X_test_list[0].shape[0]-1)
-            pred_X_list_level = pred_X_test_list[0][NUM], pred_X_test_list[1][NUM], pred_X_test_list[2][NUM]
-            X_list_level = X_test_list[0][NUM], X_test_list[1][NUM], X_test_list[2][NUM]
+            save_grid_LM(pred_test_list[0], test_w_list[0], test_o_list[0], fig_path, str(args.task_type))
+            print('LM test results saved at:', fig_path)
             
-            save_1_levels(pred_X_list_level, fig_path, str(args.task_type), 'pre', color='gray')
-            save_1_levels(X_list_level, fig_path, str(args.task_type), 'low', color='gray')
-            print('EM Test results saved at:', NUM, fig_path)
+        elif args.microscopy == 'EM':
+            save_grid_EM(pred_X_test_list[0], X_test_list[0], fig_path, str(args.task_type), NUM=10)
+            print('EM Test results saved at:', fig_path)
             
         else:
             print('wrong microscopy restoration for saving')
@@ -192,5 +180,6 @@ if __name__ == "__main__":
     
     test(args)
 
+# python test_DeBCR.py --microscopy LM --task 2D_denoising --save_fig True
 # python test_DeBCR.py --microscopy EM --task high_ET --save_fig True
 # python test_DeBCR.py --microscopy LM --task bright_SR --save_fig True
