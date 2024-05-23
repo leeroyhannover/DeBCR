@@ -3,7 +3,7 @@
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Dense, Conv2D, AveragePooling2D, Reshape, Concatenate
 from tensorflow.keras.layers import *
-from keras.layers.local import LocallyConnected2D
+#from keras.layers.local import LocallyConnected2D
 from tensorflow.keras.models import Model
 from util.loss_func import *
 from util.metrics import *
