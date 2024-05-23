@@ -154,7 +154,8 @@ def test(args):
             print('LM test results saved at:', NUM, fig_path)
         elif args.microscopy == 'EM':
             # NUM = random.randint(0, X_test_list[0].shape[0]-1) # 2999 for high_ET, 85 for low_ET
-            NUM = 2999
+            # NUM = 2999
+            NUM = random.randint(0, pred_X_test_list[0].shape[0]-1)
             pred_X_list_level = pred_X_test_list[0][NUM], pred_X_test_list[1][NUM], pred_X_test_list[2][NUM]
             X_list_level = X_test_list[0][NUM], X_test_list[1][NUM], X_test_list[2][NUM]
             
