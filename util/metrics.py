@@ -25,7 +25,7 @@ def metrics(IMG1, IMG2):
         psnr_accumulator += psnr_value
 
         # SSIM
-        ssim_value, _ = structural_similarity(img1, img2, full=True)
+        ssim_value, _ = structural_similarity(img1, img2, data_range=1, full=True)
         ssim_accumulator += ssim_value
 
         # RMSE
