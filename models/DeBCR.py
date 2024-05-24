@@ -240,7 +240,7 @@ def inverse_RDN_mimo(input_shape, alpha1, alpha2, w1, w2, Ncnn1, Ncnn2, RDN=3):
     
     return model
 
-def model_m_rBCR(IMG_SHAPE=(128, 128, 1)):
+def model_DeBCR(IMG_SHAPE=(128, 128, 1)):
     
     # Create the full model
     input_shape = IMG_SHAPE

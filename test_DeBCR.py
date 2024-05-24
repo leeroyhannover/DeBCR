@@ -22,7 +22,7 @@ def test(args):
     #####
     #config the model, load the weights
     weight_path = args.weight_path + str(args.task_type) + '/'
-    eval_model = model_m_rBCR()
+    eval_model = model_DeBCR()
     eval_model.compile(optimizer='adam', loss=loss_function_mimo, metrics=[metrics_func_mimo]) 
 
     # reload the check point
