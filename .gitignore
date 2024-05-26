@@ -1,5 +1,5 @@
 # notebooks
-*.ipynb
+# *.ipynb
 .ipynb_checkpoints
 
 # weights
