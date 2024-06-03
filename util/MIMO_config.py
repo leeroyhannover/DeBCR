@@ -14,8 +14,8 @@ parser.add_argument('--weight_decay', type=float, default=0)
 parser.add_argument('--num_epoch', type=int, default=3000)
 parser.add_argument('--print_freq', type=int, default=100)
 parser.add_argument('--num_worker', type=int, default=8)
-parser.add_argument('--save_freq', type=int, default=100) # 原本为100
-parser.add_argument('--valid_freq', type=int, default=100)  # 原本是100
+parser.add_argument('--save_freq', type=int, default=100)
+parser.add_argument('--valid_freq', type=int, default=100) 
 parser.add_argument('--resume', type=str, default='')
 parser.add_argument('--gamma', type=float, default=0.5)
 parser.add_argument('--lr_steps', type=list, default=[(x+1) * 500 for x in range(3000//500)])
