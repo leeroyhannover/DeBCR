@@ -4,34 +4,7 @@ import matplotlib.pyplot as plt
 import glob
 import random
 import argparse
-    
-# visualization for two images
-def subShow3(IMG1, IMG2, IMG3, color='inferno'):
-    # plt.figure(figsize=(2, 3), dpi=250)
-    
-    plt.subplot(1,3,1)
-    plt.imshow(IMG1, cmap=color)
-    plt.axis('off')
-    
-    plt.subplot(1,3,2)
-    plt.imshow(IMG2, cmap=color)
-    plt.axis('off')
-    
-    plt.subplot(1,3,3)
-    plt.imshow(IMG3, cmap=color)
-    plt.axis('off')
-    plt.show()
-    
-def subShow(IMG1, IMG2, color='inferno'):
-    plt.figure()
-    plt.subplot(1,2,1)
-    plt.imshow(IMG1, cmap=color)
-    plt.subplot(1,2,2)
-    plt.imshow(IMG2, cmap=color)
-    plt.show()
-    plt.close()
-    
-    
+     
 def dict_to_namespace(config):
     """
     Converts a dictionary to a namespace object.
@@ -55,50 +28,18 @@ def multi_input(w_img, o_img):
     
     return [w_0, w_2, w_4], [o_0, o_2, o_4]
 
-def save_svg(image_stack, domain, kind, path):
-    # Define the path where you want to save the SVG files
-    output_path = path
-    os.makedirs(output_path, exist_ok=True)
-
-    # Loop through the image stack and save each element as an SVG file
-    for i in range(image_stack.shape[0]):
-        image = image_stack[i, :, :, 0]
-
-        plt.figure(figsize=(1.28, 1.28), dpi=300)  # Set figsize and dpi to match the 128x128 size
-        plt.imshow(image, cmap='inferno')
-        plt.axis('off')
-        svg_filename = os.path.join(output_path, f"{str(kind)}_{i:03d}_{str(domain)}.svg")
-        plt.savefig(svg_filename, format='svg', bbox_inches='tight', pad_inches=0)
-        plt.close()
-
-def save_3_levels(image_list, output_path, domain, kind):
-    
-    for i in range(len(image_list)):
-        image = image_list[i]
-        plt.figure(figsize=(1.28, 1.28), dpi=300)  # Set figsize and dpi to match the 128x128 size
-        plt.imshow(image, cmap='inferno')
-        plt.axis('off')
-        svg_filename = os.path.join(output_path, f"{str(kind)}_{i:03d}_{str(domain)}.svg")
-        plt.savefig(svg_filename, format='svg', bbox_inches='tight', pad_inches=0)
-    print('finish save')
-    
-def save_1_levels(image_list, output_path, domain, kind, color='inferno'):
-    
-    image = image_list[0]
-    plt.figure(figsize=(1.28, 1.28), dpi=300)  # Set figsize and dpi to match the 128x128 size
-    plt.imshow(image, cmap=color)
-    plt.axis('off')
-    svg_filename = os.path.join(output_path, f"{str(kind)}_{str(domain)}.svg")
-    plt.savefig(svg_filename, format='svg', bbox_inches='tight', pad_inches=0)
-    
-    print('finish save')
-    
-def save_grid_LM(pred_list, w_list, o_list, output_path, domain, NUM=5, color='inferno'):
+def save_grid_LM(pred_list, w_list, o_list, output_path, domain, eval_results, NUM=5, color='inferno'):
     num_images = NUM
     random_indices = random.sample(range(len(w_list)), num_images)
+    
+    # Format the title string using eval_results
+    title_str = f'all test: PSNR: {eval_results[0]:.2f}, SSIM: {eval_results[1]:.4f}, RMSE: {eval_results[2]:.4f}'
 
     fig, axes = plt.subplots(3, num_images, figsize=(num_images * 3, 9))
     
+    # Set the figure title
+    fig.suptitle(title_str, fontsize=16)
+
     for i, idx in enumerate(random_indices):
         axes[0, i].imshow(w_list[idx], cmap=color)
         axes[0, i].axis('off')
@@ -132,7 +73,7 @@ def save_grid_LM(pred_list, w_list, o_list, output_path, domain, NUM=5, color='i
             axes[2, i].xaxis.set_ticks([])  
             axes[2, i].xaxis.set_ticklabels([]) 
     
-    plt.tight_layout()
+    plt.tight_layout(rect=[0, 0, 1, 0.96])  # Adjust rect to make room for the title
     svg_filename = os.path.join(output_path, f"{str(domain)}.png")
     plt.savefig(svg_filename, bbox_inches='tight', pad_inches=0, dpi=96)
     plt.close()

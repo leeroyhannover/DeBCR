@@ -134,25 +134,6 @@ def test(args):
         
         
     #####
-    # save the results as fig
-    if args.save_fig and not args.whole_predict:
-        # save a random fig under path
-        fig_path = args.results_path + str(args.task_type) + '/'
-        
-        if not os.path.exists(fig_path):
-            os.makedirs(fig_path)
-        
-        if args.microscopy == 'LM':
-            save_grid_LM(pred_test_list[0], test_w_list[0], test_o_list[0], fig_path, str(args.task_type))
-            print('LM test results saved at:', fig_path)
-            
-        elif args.microscopy == 'EM':
-            save_grid_EM(pred_X_test_list[0], X_test_list[0], fig_path, str(args.task_type), NUM=10)
-            print('EM Test results saved at:', fig_path)
-            
-        else:
-            print('wrong microscopy restoration for saving')
-    
     # evaluation by the metrics
     if args.microscopy == 'EM':
         print('EM evaluation')
@@ -165,6 +146,27 @@ def test(args):
         print('Test performance(PSNR, SSIM, RMSE)', psnr_value.round(2), ssim_value.round(2), rmse.round(2))
     else:
         print('illegal microscopy for evaluation')
+
+    # save the results as fig
+    if args.save_fig and not args.whole_predict:
+        # save a random fig under path
+        fig_path = args.results_path + str(args.task_type) + '/'
+        
+        if not os.path.exists(fig_path):
+            os.makedirs(fig_path)
+        
+        if args.microscopy == 'LM':
+            eval_results = [psnr_value, ssim_value, rmse]
+            save_grid_LM(pred_test_list[0], test_w_list[0], test_o_list[0], fig_path, str(args.task_type), eval_results)
+            print('LM test results saved at:', fig_path)
+            
+        elif args.microscopy == 'EM':
+            save_grid_EM(pred_X_test_list[0], X_test_list[0], fig_path, str(args.task_type), NUM=10)
+            print('EM Test results saved at:', fig_path)
+            
+        else:
+            print('wrong microscopy restoration for saving')
+    
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="DeBCR_tester")
