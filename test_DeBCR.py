@@ -10,7 +10,7 @@ from natsort import natsorted
 
 from util.utils import *
 from models.DeBCR import *
-from util.loss_func import *
+# from util.loss_func import *
 from util.metrics import *
 from util.data import *
 from util.whole_img_tester import *
