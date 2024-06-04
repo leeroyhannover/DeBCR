@@ -4,6 +4,32 @@ import matplotlib.pyplot as plt
 import glob
 import random
 import argparse
+
+# visualization for two images
+def subShow3(IMG1, IMG2, IMG3, color='inferno'):
+    # plt.figure(figsize=(2, 3), dpi=250)
+
+    plt.subplot(1,3,1)
+    plt.imshow(IMG1, cmap=color)
+    plt.axis('off')
+
+    plt.subplot(1,3,2)
+    plt.imshow(IMG2, cmap=color)
+    plt.axis('off')
+
+    plt.subplot(1,3,3)
+    plt.imshow(IMG3, cmap=color)
+    plt.axis('off')
+    plt.show()
+
+def subShow(IMG1, IMG2, color='inferno'):
+    plt.figure()
+    plt.subplot(1,2,1)
+    plt.imshow(IMG1, cmap=color)
+    plt.subplot(1,2,2)
+    plt.imshow(IMG2, cmap=color)
+    plt.show()
+    plt.close()
      
 def dict_to_namespace(config):
     """
