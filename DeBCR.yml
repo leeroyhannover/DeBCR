@@ -13,3 +13,4 @@ dependencies:
     - natsort
     - matplotlib
     - scikit-image
+    - PyYAML
