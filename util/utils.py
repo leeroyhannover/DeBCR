@@ -6,8 +6,12 @@ import random
 import argparse
 
 # visualization for two images
-def subShow3(IMG1, IMG2, IMG3, color='inferno'):
-    # plt.figure(figsize=(2, 3), dpi=250)
+def subShow3(IMG1, IMG2, IMG3, domain='LM'):
+    
+    if domain == "LM":
+        color = 'inferno'
+    else:
+        color = 'gray'
 
     plt.subplot(1,3,1)
     plt.imshow(IMG1, cmap=color)
@@ -22,7 +26,13 @@ def subShow3(IMG1, IMG2, IMG3, color='inferno'):
     plt.axis('off')
     plt.show()
 
-def subShow(IMG1, IMG2, color='inferno'):
+def subShow(IMG1, IMG2, domain='LM'):
+    
+    if domain == "LM":
+        color = 'inferno'
+    else:
+        color = 'gray'
+        
     plt.figure()
     plt.subplot(1,2,1)
     plt.imshow(IMG1, cmap=color)
@@ -178,8 +188,38 @@ def save_grid_EM(pred_list, w_list, output_path, domain, NUM=5, color='gray'):
     svg_filename = os.path.join(output_path, f"{str(domain)}.png")
     plt.savefig(svg_filename, bbox_inches='tight', pad_inches=0, dpi=96)
     plt.close()
+    
+def show_grid_EM(pred_list, w_list, NUM=5, color='gray'):
+    
+    num_images = NUM
+    random_indices = random.sample(range(len(w_list)), num_images)
+    fig, axes = plt.subplots(2, num_images, figsize=(num_images * 2, 6))
+    
+    for i, idx in enumerate(random_indices):
+        axes[0, i].imshow(w_list[idx], cmap=color)
+        axes[0, i].axis('off')
+        if i == 0:
+            axes[0, i].axis('on')
+            axes[0, i].set_ylabel('Input', fontsize=12, labelpad=10)
+            axes[0, i].yaxis.set_ticks([])  
+            axes[0, i].yaxis.set_ticklabels([])  
+            axes[0, i].xaxis.set_ticks([])  
+            axes[0, i].xaxis.set_ticklabels([]) 
 
-
+    for i, idx in enumerate(random_indices):
+        axes[1, i].imshow(pred_list[idx], cmap=color)
+        axes[1, i].axis('off')
+        if i == 0:
+            axes[1, i].axis('on')
+            axes[1, i].set_ylabel('Prediction', fontsize=12, labelpad=10)
+            axes[1, i].yaxis.set_ticks([])  
+            axes[1, i].yaxis.set_ticklabels([])  
+            axes[1, i].xaxis.set_ticks([])  
+            axes[1, i].xaxis.set_ticklabels([]) 
+    
+    plt.tight_layout()
+    plt.show()
+    
 def rescale(image_stack, MIN=0, MAX=1):
     # Rescale the whole stack
     if image_stack[0].max() != 1:
@@ -192,15 +232,16 @@ def rescale(image_stack, MIN=0, MAX=1):
         image_scale = image_stack
     return np.asarray(image_scale)
 
-# load other databanks (CARE, TAGAN) for applications            
+# load databanks for both LM and EM
 class DataGenerator:
-    def __init__(self, data_dir, data_list, batch_size, noise):
+    def __init__(self, data_dir, data_list, batch_size, noise, domain='LM'):
         # Set the location of the data
         self.data_dir = data_dir
         self.data_list = data_list
         self.batch_size = batch_size
         self.noise = noise
-
+        self.domain = domain
+        
     def _rescale(self, image_stack, MIN=0, MAX=1):
         # Rescale the whole stack
         if image_stack[0].max() != 1:
@@ -217,26 +258,24 @@ class DataGenerator:
         return np.nan_to_num((x - np.amin(x, axis=(1, 2, 3), keepdims=True)) / (
                 np.amax(x, axis=(1, 2, 3), keepdims=True) - np.amin(x, axis=(1, 2, 3), keepdims=True)))
     
-    def _forward_model_conv(x):
-        # convolve the model  
-        conv_kernel = tf.cast(x[0][..., 0], dtype=tf.complex64)
-        pred_img = tf.cast(x[1][..., 0], dtype=tf.complex64)
-        ft_conv_kernel = tf.signal.fftshift(tf.signal.fft2d(tf.signal.ifftshift(conv_kernel)))
-        ft_pred_img = tf.signal.fftshift(tf.signal.fft2d(tf.signal.ifftshift(pred_img)))
-        conv_img_ft = ft_conv_kernel * ft_pred_img
-        out_img_d = tf.signal.fftshift(tf.signal.ifft2d(tf.signal.ifftshift(conv_img_ft)))
-
-        return tf.expand_dims(out_img_d, -1)
-    
     def imageLoader(self):
         
             for index, dataset_name in enumerate(self.data_list):
                 print('Loading dataset:', dataset_name)
                 temp_dataset = np.load(self.data_dir + dataset_name)
-                w_imgs, o_imgs = (
-                    temp_dataset['low'],
-                    temp_dataset['gt']
-                )
+                
+                if self.domain == 'LM':
+                    w_imgs, o_imgs = (
+                        temp_dataset['low'],
+                        temp_dataset['gt']
+                    )
+                elif self.domain == 'EM':
+                    w_imgs, o_imgs = (
+                        temp_dataset['X'],
+                        temp_dataset['Y']
+                    )
+                else:
+                    print('illegal domain')
                 w_imgs, o_imgs = np.expand_dims(w_imgs, axis=3), np.expand_dims(o_imgs, axis=3)
                 L = w_imgs.shape[0]
                 batch_start = 0
@@ -252,8 +291,6 @@ class DataGenerator:
                         gaussian_sigma, lambda_poisson=np.random.uniform(0.0, 0.05), np.random.uniform(0.0, 0.1)
                         gaussian_noise = np.random.normal(0, gaussian_sigma, w_img_temp.shape)
                         poisson_noise = np.random.poisson(lambda_poisson, w_img_temp.shape)
-                        # gaussian_noise = np.clip(gaussian_noise, 0, 1)
-                        # poisson_noise = np.clip(poisson_noise, 0, 1)
                         w_img_temp = w_img_temp + 0.5*gaussian_noise #+ 0.5*poisson_noise
                     
                     # Rescale into [0, 1]

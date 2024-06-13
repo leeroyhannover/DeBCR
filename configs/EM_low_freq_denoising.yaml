@@ -1,0 +1,26 @@
+dataset: "Low_freq_denoising"
+data:
+    image_size: 128
+    channels: 1
+    noise: False
+    train_batch: 32
+    val_batch: 16
+    data_dir: "/bigdata/casus/MLID/RuiLi/Data/LM/bcr_application/EM_data/cryoCareData/processed/recon/BCR/"
+    domain: "EM"
+
+model:
+    type: "EM_denoising"
+    in_ch: 1
+    out_ch: 1
+    Nrho: 128
+    Ntheta: 128
+
+training:
+    NUM_STEPS: 500
+    best_val_loss: 'inf'
+    opti: 'adam'
+    lr: 0.001
+    ckpt_path: './checkpoint/EM_low_freq_denoising/'
+    save_freq: 50
+    val_freq: 100
+    visual: True
