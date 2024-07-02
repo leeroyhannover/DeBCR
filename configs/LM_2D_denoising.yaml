@@ -5,7 +5,7 @@ data:
     noise: False
     train_batch: 32
     val_batch: 16
-    data_dir: "/bigdata/casus/MLID/RuiLi/Data/LM/bcr_application/CARE_data/processed/2D_denoising/"
+    data_dir: "/full/path/to/data/2D_denoising/"
     domain: "LM"
 
 model:

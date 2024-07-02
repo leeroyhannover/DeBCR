@@ -5,7 +5,7 @@ data:
     noise: False
     train_batch: 32
     val_batch: 16
-    data_dir: "/bigdata/casus/MLID/RuiLi/Data/LM/bcr_application/EM_data/cryoCareData/processed/recon/BCR/"
+    data_dir: "/full/path/to/data/low_ET/"
     domain: "EM"
 
 model:
