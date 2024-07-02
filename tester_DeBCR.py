@@ -17,6 +17,9 @@ from util.whole_img_tester import *
 
 def test(args):
     print('task:', args.task_type)
+
+    os.environ['CUDA_VISIBLE_DEVICES']=str(args.gpu_id)
+    print('GPU ID: ', tf.config.list_physical_devices("GPU"))
     
     #####
     #config the model, load the weights
@@ -118,17 +121,32 @@ def test(args):
     elif args.task_type == 'high_ET':
         if args.whole_predict:
             pass  # for the prediction in whole image
-        
+            
         else:
-            test_raw = np.load(os.path.join(test_dir, test_list[1]))
+            #test_raw = np.load(os.path.join(test_dir, test_list[1]))
+            test_raw = np.load(os.path.join(test_dir, test_list[0]))
+            print(test_raw['X'].shape, test_raw['Y'].shape)
+            
             X_test_patches, Y_test_patches = test_raw['X'], test_raw['Y']  # even, odd
             X_test_patches, Y_test_patches = np.expand_dims(X_test_patches, axis=3), np.expand_dims(Y_test_patches, axis=3)
             X_test_patches, Y_test_patches = rescale(X_test_patches), rescale(Y_test_patches)
-
+            
+            X_test_patches, Y_test_patches = clip_intensity(X_test_patches), clip_intensity(Y_test_patches) 
             X_test_list, Y_test_list = multi_input(X_test_patches, Y_test_patches)
 
             pred_X_test_list = eval_model.predict(X_test_list)
             pred_Y_test_list = eval_model.predict(Y_test_list)
+
+            data_path = args.results_path + str(args.task_type) + '/data'
+            if not os.path.exists(data_path):
+                os.makedirs(data_path)
+            
+            pred_X_test_arr = np.asarray(pred_X_test_list[0]) 
+            pred_Y_test_arr = np.asarray(pred_Y_test_list[0])
+            pred_X_test_arr, pred_Y_test_arr = np.squeeze(pred_X_test_arr), np.squeeze(pred_Y_test_arr)
+            print(pred_X_test_arr.shape, pred_Y_test_arr.shape)
+            
+            np.savez(data_path + '/results.npz', X=pred_X_test_arr, Y=pred_Y_test_arr)
     else:
         print('illegal task')
         
@@ -177,6 +195,8 @@ if __name__ == "__main__":
     parser.add_argument("--save_fig", type=bool, default=False, help="save the figs or not")
     parser.add_argument("--results_path", type=str, default='./results/', help="path to save test results fig")
     parser.add_argument("--whole_predict", type=bool, default=False, help="predict the whole image for certain tasks")
+    parser.add_argument("--gpu_id", type=int, default=0, help="GPU ID to be used")
+
     args = parser.parse_args()
     
     test(args)
