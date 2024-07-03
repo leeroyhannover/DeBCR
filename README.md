@@ -33,9 +33,9 @@ Due to the absence of ground-truth data in cryoET, the **DeBCR** was model intro
 ## Quick start
 
 We prepared multiple resources to help you get started with DeBCR:
-1. [CodeOcean capsule](https://codeocean.com/capsule/0002319/tree) - a ready-to-run environment with the provided data and trained model to get a first impression of the DeBCR-based images restoration.
+1. `CodeOcean capsule` (*link is upcoming*) - a ready-to-run environment with the provided data and trained model to get a first impression of the DeBCR-based images restoration.
 2. [Google Colab Notebook](https://colab.research.google.com/drive/13tOQXL3jMNyObZQyjAgdwzNjh0uN206o?usp=sharing) - the training notebook in order to demonstrate DeBCR training process on the provided as well as custom data.
-3. [this GitHub repository](https://github.com/leeroyhannover/DeBCR) with the deposited source code for local training and predictions.
+2. `this GitHub repository` with the deposited source code for local training and predictions.
 
 ## Local usage
 
