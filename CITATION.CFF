@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Li
+    given-names: Rui
+    orcid: https://orcid.org/0000-0002-3085-5267
+  - family-names: Yushkevich
+    given-names: Artsemi
+    orcid: https://orcid.org/0000-0002-8729-9281
+  - family-names: Chu
+    given-names: Xiaofeng
+    orcid: https://orcid.org/0000-0001-6801-3949
+  - family-names: Kudryashev
+    given-names: Mikhail
+    orcid: https://orcid.org/0000-0003-3550-6274
+  - family-names: Yakimovich
+    given-names: Artur
+    orcid: https://orcid.org/0000-0003-2458-4904
+    
+title: "Denoising, Deblurring, and optical Deconvolution for cryo-ET and light microscopy with a physics-informed deep neural network DeBCR"
+version: 0.1
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.12636434
+date-released: 2024-07-03
