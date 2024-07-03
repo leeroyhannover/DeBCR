@@ -1,4 +1,5 @@
-# DeBCR: denoising, deblurring, and optical deconvolution using a physics-informed neural network for light microscopy and cryo-ET
+# DeBCR
+### Denoising, deblurring, and optical deconvolution using a physics-informed neural network for light microscopy and cryo-ET
 
 **DeBCR** is a physics-informed deep learning model for light and electron microscopy image restorations (deblurring, denoising, and deconvolution).
 
@@ -8,10 +9,21 @@
 
 ## Contents
 
-- [About DeBCR](#about-debcr) - a brief description of the project
 - [Quick start](#quick-start) - resources to get started with **DeBCR**
+- [About DeBCR](#about-debcr) - key points of the network structure and results examples
 - [Local usage](#local-usage) - instructions on local install, training and prediction
 - [Example datasets](#example-datasets) - publicly deposited example LM/EM datasets used for DeBCR benchmarks/tutorials
+
+## Quick start
+
+We prepared multiple resources to help you get started with DeBCR (by complexity levels):
+1. `CodeOcean capsule` (*link will become available soon*) - a ready-to-run environment with the provided data and trained model to get a first impression of the DeBCR results for various image restoration tasks.
+2. `Google Colab Notebook(s)` - the guiding notebook(s) with accessible GPU resources available online, see the table below (to be extended).
+   | Notebooks                                                                                               | Description |
+   | :------------------------------------------------------------------------------------------------------ | ----------- |
+   | [DeBCR_train](https://githubtocolab.com/leeroyhannover/DeBCR/notebooks/DeBCR_train.ipynb)  | Demostrates DeBCR training data and parameters setup and training process. The example data is available to be provided automatically. |
+
+3. Open-source code (this GitHub repository) with guidelines on its [Local usage](#local-usage) for training and prediction.
 
 ## About DeBCR
 
@@ -27,15 +39,9 @@ The example of the **DeBCR** performance on the light microscopy data (low/high 
 Due to the absence of ground-truth data in cryoET, the **DeBCR** was model introduced into the Noise2Noise framework. The example of the **DeBCR** performance on the cryo-electron microscopy data (*Chlamydomonas reinhardtii* cilia dataset from [Cryo-CARE](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=8759519&tag=1)) is provided below:
 ![DeBCR EM](images/DeBCR_EM.svg)
 
-For more details on implementaion and benchmarks please see our preprint (***to be released soon***):
- Li R., Yushkevich A., Chu X., Kudryashev M., Yakimovich A. Denoising, Deblurring, and optical Deconvolution for cryo-ET and light microscopy with a physics-informed deep neural network DeBCR. *in submission*, 2024.
+For more details on implementaion and benchmarks please see our preprint (*to be released soon*):
 
-## Quick start
-
-We prepared multiple resources to help you get started with DeBCR:
-1. `CodeOcean capsule` (*link is upcoming*) - a ready-to-run environment with the provided data and trained model to get a first impression of the DeBCR-based images restoration.
-2. [Google Colab Notebook](https://colab.research.google.com/drive/13tOQXL3jMNyObZQyjAgdwzNjh0uN206o?usp=sharing) - the training notebook in order to demonstrate DeBCR training process on the provided as well as custom data.
-2. `this GitHub repository` with the deposited source code for local training and predictions.
+Li R., Yushkevich A., Chu X., Kudryashev M., Yakimovich A. Denoising, Deblurring, and optical Deconvolution for cryo-ET and light microscopy with a physics-informed deep neural network DeBCR. *in submission*, 2024.
 
 ## Local usage
 
