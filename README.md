@@ -4,9 +4,6 @@
 
 **DeBCR** is an open-source project and is licensed under [MIT license](LICENSE).
 
-For more details on implementaion and benchmarks please see our preprint (***to be released soon***):
- Li R., Yushkevich A., Chu X., Kudryashev M., Yakimovich A. Denoising, Deblurring, and optical Deconvolution for cryo-ET and light microscopy with a physics-informed deep neural network DeBCR. *in submission*, 2024.
-
  For the installation/usage questions please write to the [Issue Tracker](https://github.com/leeroyhannover/DeBCR/issues).
 
 ## Contents
@@ -29,6 +26,9 @@ The example of the **DeBCR** performance on the light microscopy data (low/high 
 
 Due to the absence of ground-truth data in cryoET, the **DeBCR** was model introduced into the Noise2Noise framework. The example of the **DeBCR** performance on the cryo-electron microscopy data (*Chlamydomonas reinhardtii* cilia dataset from [Cryo-CARE](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=8759519&tag=1)) is provided below:
 ![DeBCR EM](images/DeBCR_EM.svg)
+
+For more details on implementaion and benchmarks please see our preprint (***to be released soon***):
+ Li R., Yushkevich A., Chu X., Kudryashev M., Yakimovich A. Denoising, Deblurring, and optical Deconvolution for cryo-ET and light microscopy with a physics-informed deep neural network DeBCR. *in submission*, 2024.
 
 ## Quick start
 
