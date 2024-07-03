@@ -23,7 +23,7 @@ We prepared multiple resources to help you get started with DeBCR (by complexity
    | :------------------------------------------------------------------------------------------------------ | ----------- |
    | [DeBCR_train](https://githubtocolab.com/leeroyhannover/DeBCR/notebooks/DeBCR_train.ipynb)  | Demostrates DeBCR training data and parameters setup and training process. The example data is available to be provided automatically. |
 
-3. Open-source code (this GitHub repository) with guidelines on its [Local usage](#local-usage) for training and prediction.
+3. `Open-source code` (this GitHub repository) with guidelines on its [Local usage](#local-usage) for training and prediction.
 
 ## About DeBCR
 
@@ -71,13 +71,13 @@ conda activate debcr-env
 
 ### Local training
 
-For the local training we provide an example Jupyter Notebook [train.ipynb](train.ipynb), which is located in the parent directory of the repository. This notebook guides you through the training process using provided examples of already pre-processed data, which are publicly available on Zenodo (for a link see [Example datasets](#example-datasets)). Currently the notebook covers two tasks/datasets examples:
+For the local training we provide an example Jupyter Notebook [train_local.ipynb](train_local.ipynb), which is located in the parent directory of the repository. This notebook guides you through the training process using provided examples of already pre-processed data, which are publicly available on Zenodo (for a link see [Example datasets](#example-datasets)). Currently the notebook covers two tasks/datasets examples:
 - **LM: 2D denoising** (files: LM_2D_CARE_X.npz) - low/high exposure confocal dataset of *Schmidtea mediterranea* (`Denoising_Planaria` dataset) from the publication of CARE network applied to fluorescent microscopy data ([Weigert, Schmidt, Boothe et al., Nature Methods, 2018](https://www.nature.com/articles/s41592-018-0216-7)).
 - **EM: low-frequency denoising** (files: EM_low_Tomo110_X.npz) - cryoET dataset of *Chlamydomonas reinhardtii* cilia (`Tomo110` dataset) from the cryo-CARE publication ([Buchholz et al., IEEE (ISBI), 2019](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=8759519&tag=1)).
 
 The same data is used to train **DeBCR** in additionally provided Colab Notebook (for a link see [Quick start](#quick-start)). The preprocessing procedures from raw LM/EM microscopy data will become available in the future.
 
-To get started with the notebook, you need to additionally install [Jupyter Notebook](https://jupyter.org/install), open and use your DeBCR environment `debcr-env` as kernel. Further please follow the structure of the [train.ipynb](train.ipynb) notebook for the training.
+To get started with the notebook, you need to additionally install [Jupyter Notebook](https://jupyter.org/install), open and use your DeBCR environment `debcr-env` as kernel. Further please follow the structure of the [train_local.ipynb](train_local.ipynb) notebook for the training.
 
 ### Local prediction
 
@@ -100,11 +100,37 @@ data
         └── LM_2D_CARE_val.npz
 ```
 
-To get an overview of parameters and their description
+The up-to-date usage instructions can be obtained by
 ```bash
 python /path/to/DeBCR/tester_DeBCR.py --help
 ```
-Several comments:
+
+and are provided as well below:
+```bash
+usage: tester_DeBCR.py [-h] [--microscopy MICROSCOPY] [--task_type TASK_TYPE] [--weight_path WEIGHT_PATH] [--testset_path TESTSET_PATH] [--save_fig SAVE_FIG]
+                       [--results_path RESULTS_PATH] [--whole_predict WHOLE_PREDICT] [--gpu_id GPU_ID]
+
+DeBCR_tester
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --microscopy MICROSCOPY
+                        LM or ET
+  --task_type TASK_TYPE
+                        2D_denoising,3D_denoising,bright_SR, confocal_SR, low_ET, high_ET
+  --weight_path WEIGHT_PATH
+                        path to load weight
+  --testset_path TESTSET_PATH
+                        path to load test datset
+  --save_fig SAVE_FIG   save the figs or not
+  --results_path RESULTS_PATH
+                        path to save test results fig
+  --whole_predict WHOLE_PREDICT
+                        predict the whole image for certain tasks
+  --gpu_id GPU_ID       GPU ID to be used
+```
+
+Additinoal comments on some parameters:
 - the `weight_path` should point to the `/path/to/DeBCR/weights/`
 - the `testset_path`should point to the data folder structured as shown above
 - all paths should end with slash `/`
