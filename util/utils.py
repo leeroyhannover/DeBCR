@@ -7,13 +7,10 @@ import random
 import argparse
 
 # visualization for two images
-def subShow3(IMG1, IMG2, IMG3, domain='LM'):
+def subShow3(IMG1, IMG2, IMG3):
     
-    if domain == "LM":
-        color = 'inferno'
-    else:
-        color = 'gray'
-
+    color = 'inferno'
+    
     plt.subplot(1,3,1)
     plt.imshow(IMG1, cmap=color)
     plt.axis('off')
@@ -27,12 +24,9 @@ def subShow3(IMG1, IMG2, IMG3, domain='LM'):
     plt.axis('off')
     plt.show()
 
-def subShow(IMG1, IMG2, domain='LM'):
+def subShow(IMG1, IMG2):
     
-    if domain == "LM":
-        color = 'inferno'
-    else:
-        color = 'gray'
+    color = 'inferno'
         
     plt.figure()
     plt.subplot(1,2,1)
@@ -65,7 +59,7 @@ def multi_input(w_img, o_img):
     
     return [w_0, w_2, w_4], [o_0, o_2, o_4]
 
-def save_grid_LM(pred_list, w_list, o_list, output_path, domain, eval_results, NUM=5, color='inferno'):
+def save_grid(pred_list, w_list, o_list, output_path, domain, eval_results, NUM=5, color='inferno'):
     num_images = NUM
     random_indices = random.sample(range(len(w_list)), num_images)
     
@@ -115,7 +109,7 @@ def save_grid_LM(pred_list, w_list, o_list, output_path, domain, eval_results, N
     plt.savefig(svg_filename, bbox_inches='tight', pad_inches=0, dpi=96)
     plt.close()
     
-def show_grid_LM(pred_list, w_list, o_list, NUM=5, color='inferno'):
+def show_grid(pred_list, w_list, o_list, NUM=5, color='inferno'):
     num_images = NUM
     random_indices = random.sample(range(len(w_list)), num_images)
 
@@ -156,70 +150,6 @@ def show_grid_LM(pred_list, w_list, o_list, NUM=5, color='inferno'):
     
     plt.tight_layout()
     plt.show()
-   
-def save_grid_EM(pred_list, w_list, output_path, domain, NUM=5, color='gray'):
-    
-    num_images = NUM
-    random_indices = random.sample(range(len(w_list)), num_images)
-    fig, axes = plt.subplots(2, num_images, figsize=(num_images * 2, 6))
-    
-    for i, idx in enumerate(random_indices):
-        axes[0, i].imshow(w_list[idx], cmap=color)
-        axes[0, i].axis('off')
-        if i == 0:
-            axes[0, i].axis('on')
-            axes[0, i].set_ylabel('Input', fontsize=12, labelpad=10)
-            axes[0, i].yaxis.set_ticks([])  
-            axes[0, i].yaxis.set_ticklabels([])  
-            axes[0, i].xaxis.set_ticks([])  
-            axes[0, i].xaxis.set_ticklabels([]) 
-
-    for i, idx in enumerate(random_indices):
-        axes[1, i].imshow(pred_list[idx], cmap=color)
-        axes[1, i].axis('off')
-        if i == 0:
-            axes[1, i].axis('on')
-            axes[1, i].set_ylabel('Prediction', fontsize=12, labelpad=10)
-            axes[1, i].yaxis.set_ticks([])  
-            axes[1, i].yaxis.set_ticklabels([])  
-            axes[1, i].xaxis.set_ticks([])  
-            axes[1, i].xaxis.set_ticklabels([]) 
-    
-    plt.tight_layout()
-    svg_filename = os.path.join(output_path, f"{str(domain)}.png")
-    plt.savefig(svg_filename, bbox_inches='tight', pad_inches=0, dpi=96)
-    plt.close()
-    
-def show_grid_EM(pred_list, w_list, NUM=5, color='gray'):
-    
-    num_images = NUM
-    random_indices = random.sample(range(len(w_list)), num_images)
-    fig, axes = plt.subplots(2, num_images, figsize=(num_images * 2, 6))
-    
-    for i, idx in enumerate(random_indices):
-        axes[0, i].imshow(w_list[idx], cmap=color)
-        axes[0, i].axis('off')
-        if i == 0:
-            axes[0, i].axis('on')
-            axes[0, i].set_ylabel('Input', fontsize=12, labelpad=10)
-            axes[0, i].yaxis.set_ticks([])  
-            axes[0, i].yaxis.set_ticklabels([])  
-            axes[0, i].xaxis.set_ticks([])  
-            axes[0, i].xaxis.set_ticklabels([]) 
-
-    for i, idx in enumerate(random_indices):
-        axes[1, i].imshow(pred_list[idx], cmap=color)
-        axes[1, i].axis('off')
-        if i == 0:
-            axes[1, i].axis('on')
-            axes[1, i].set_ylabel('Prediction', fontsize=12, labelpad=10)
-            axes[1, i].yaxis.set_ticks([])  
-            axes[1, i].yaxis.set_ticklabels([])  
-            axes[1, i].xaxis.set_ticks([])  
-            axes[1, i].xaxis.set_ticklabels([]) 
-    
-    plt.tight_layout()
-    plt.show()
     
 def rescale(image_stack, MIN=0, MAX=1):
     # Rescale the whole stack
@@ -245,13 +175,12 @@ def clip_intensity(image_stack, LOW_PERC=2, HIGH_PERC=98):
 
 # load databanks for both LM and EM
 class DataGenerator:
-    def __init__(self, data_dir, data_list, batch_size, noise, domain='LM'):
+    def __init__(self, data_dir, data_list, batch_size, noise):
         # Set the location of the data
         self.data_dir = data_dir
         self.data_list = data_list
         self.batch_size = batch_size
         self.noise = noise
-        self.domain = domain
         
     def _rescale(self, image_stack, MIN=0, MAX=1):
         # Rescale the whole stack
@@ -275,18 +204,11 @@ class DataGenerator:
                 print('Loading dataset:', dataset_name)
                 temp_dataset = np.load(self.data_dir + dataset_name)
                 
-                if self.domain == 'LM':
-                    w_imgs, o_imgs = (
-                        temp_dataset['low'],
-                        temp_dataset['gt']
-                    )
-                elif self.domain == 'EM':
-                    w_imgs, o_imgs = (
-                        temp_dataset['X'],
-                        temp_dataset['Y']
-                    )
-                else:
-                    print('illegal domain')
+                w_imgs, o_imgs = (
+                    temp_dataset['low'],
+                    temp_dataset['gt']
+                )
+                
                 w_imgs, o_imgs = np.expand_dims(w_imgs, axis=3), np.expand_dims(o_imgs, axis=3)
                 L = w_imgs.shape[0]
                 batch_start = 0

@@ -5,8 +5,6 @@ data:
     noise: False
     train_batch: 32
     val_batch: 16
-    data_dir: "/full/path/to/data/2D_denoising/"
-    domain: "LM"
 
 model:
     type: "LM_2D_denoising"
