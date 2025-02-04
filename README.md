@@ -1,5 +1,5 @@
 # DeBCR
-### Denoising, deblurring, and optical deconvolution using a physics-informed neural network for light microscopy and cryo-ET
+### Denoising, deblurring, and optical deconvolution using a physics-informed neural network for light microscopy
 
 **DeBCR** is a physics-informed deep learning model for light microscopy image restorations (deblurring, denoising, and deconvolution).
 
@@ -67,7 +67,7 @@ Installation steps are:
     micromamba env create -n debcr-env -c conda-forge python=3.9 pip
     micromamba activate debcr-env
     ```
-    * install CUDA dependencies - please use the following setup for CUDA-11.7
+    * install CUDA dependencies - please use the following setup for CUDA-11.5/7
     ```bash
     micromamba install cudatoolkit=11.7 cudnn=8.4
     pip install -r requirements_cuda11.txt
@@ -77,20 +77,39 @@ Installation steps are:
     pip install -r requirements.txt
     ```
 
-For GPU devices recognition (CUDA-11.7 setup above) during local DeBCR usage, please make the following export:
+For GPU devices recognition (CUDA-11.5/7 setup above) during local DeBCR usage, please make the following export:
 ```bash
 export LD_LIBRARY_PATH=/path/to/micromamba/envs/debcr-env/lib/python3.9/site-packages/nvidia/cudnn/lib/:${LD_LIBRARY_PATH}
 ```
 with the actual location and name of your `DeBCR` environment. 
+
+We also recommend to check that TensorFlow library, needed for our model, recognizes GPUs:
+```bash
+python
+>>> import tenforflow as tf
+>>> tf.config.list_physical_devices('GPU')
+```
+for a single GPU you should see something like:
+```
+[PhysicalDevice(name='/physical_device:GPU:0', device_type='GPU')]
+```
+
+Howeevr, if the output list is empty, please check that you have:
+* available and visible GPU
+* installed and sourced **CUDA Driver** and **CUDA Tollkit** for `CUDA-11.5/7`
+* installed CUDA dependencies for python (see instructions above)
+* activated correct python package environemnt for `DeBCR` 
+* exported to `LD_LIBRARY_PATH` correct path to cudnn libraries from your `DeBCR` environment (see instructions above)
 
 ### Local training
 
 For the local training we provide an example Jupyter Notebook [train_local.ipynb](train_local.ipynb), which is located in the parent directory of the repository. This notebook guides you through the training process using provided examples of already pre-processed data, which are publicly available on Zenodo (for a link see [Example datasets](#example-datasets)). Currently the notebook covers the following example task/dataset:
 - **LM: 2D denoising** (files: LM_2D_CARE_X.npz) - low/high exposure confocal dataset of *Schmidtea mediterranea* (`Denoising_Planaria` dataset) from the publication of CARE network applied to fluorescent microscopy data ([Weigert, Schmidt, Boothe et al., Nature Methods, 2018](https://www.nature.com/articles/s41592-018-0216-7)).
 
-The same data is used to train **DeBCR** in additionally provided Colab Notebook (for a link see [Quick start](#quick-start)). The preprocessing procedures from raw LM/EM microscopy data will become available in the future.
+The same data is used to train **DeBCR** in additionally provided Colab Notebook (for a link see [Quick start](#quick-start)). The preprocessing procedures from raw LM microscopy data will become available in the future.
 
-To get started with the notebook, you need to additionally install [Jupyter Notebook](https://jupyter.org/install), open and use your DeBCR environment `debcr-env` as kernel. Further please follow the structure of the [train_local.ipynb](train_local.ipynb) notebook for the training.
+To get started with the notebook, you need to additionally install [Jupyter Notebook or Jupyter Lab](https://jupyter.org/install) in your `DeBCR` environment, open it and, if needed, switch kearnel to your DeBCR environment `debcr-env`.
+Further please follow the instructions in the [train_local.ipynb](train_local.ipynb) notebook for the training.
 
 ### Local prediction
 
@@ -120,33 +139,29 @@ python /path/to/DeBCR/tester_DeBCR.py --help
 
 and are provided as well below:
 ```bash
-usage: tester_DeBCR.py [-h] [--microscopy MICROSCOPY] [--task_type TASK_TYPE] [--weight_path WEIGHT_PATH] [--testset_path TESTSET_PATH] [--save_fig SAVE_FIG]
-                       [--results_path RESULTS_PATH] [--whole_predict WHOLE_PREDICT] [--gpu_id GPU_ID]
+usage: tester_DeBCR.py [-h] [--task_type {2D_denoising,3D_denoising,bright_SR,confocal_SR}] [--weights_path WEIGHTS_PATH] [--ckpt_name CKPT_NAME] [--testset_path TESTSET_PATH]
+                       [--save_fig] [--fig_path FIG_PATH] [--results_path RESULTS_PATH] [--whole_predict] [--gpu_id GPU_ID]
 
-DeBCR_tester
+DeBCR: DL-based denoising, deconvolution and deblurring for light microscopy data.
 
 optional arguments:
   -h, --help            show this help message and exit
-  --microscopy MICROSCOPY
-                        LM or ET
-  --task_type TASK_TYPE
-                        2D_denoising,3D_denoising,bright_SR, confocal_SR, low_ET, high_ET
-  --weight_path WEIGHT_PATH
-                        path to load weight
+  --task_type {2D_denoising,3D_denoising,bright_SR,confocal_SR}
+                        Task type to perform according to data nature. (default: 2D_denoising)
+  --weights_path WEIGHTS_PATH
+                        Path to the folder containing weights (checkpoints) of the trained DeBCR model. (default: ./weights/TASK_TYPE/)
+  --ckpt_name CKPT_NAME
+                        Filename (w/o file extension) of the checkpoint of choice (can be a wildcard as well).
+                        If not provided, the latest (by sorted filename) checkpoint file will be used. (default: ckpt-*)
   --testset_path TESTSET_PATH
-                        path to load test datset
-  --save_fig SAVE_FIG   save the figs or not
+                        Path to the test datset as a single NPZ file. (default: None)
+  --save_fig            Flag to enable saving figures of the example test results. (default: False)
+  --fig_path FIG_PATH   Path to save figures of the example test results. (default: ./figures/)
   --results_path RESULTS_PATH
-                        path to save test results fig
-  --whole_predict WHOLE_PREDICT
-                        predict the whole image for certain tasks
-  --gpu_id GPU_ID       GPU ID to be used
+                        Path to save the test results. (default: ./results/)
+  --whole_predict       Flag to enable predicting the whole image for certain tasks. (default: False)
+  --gpu_id GPU_ID       GPU ID to be used. (default: 0)
 ```
-
-Additinoal comments on some parameters:
-- the `weight_path` should point to the `/path/to/DeBCR/weights/`
-- the `testset_path`should point to the data folder structured as shown above
-- all paths should end with slash `/`
 
 ## Example datasets
 
