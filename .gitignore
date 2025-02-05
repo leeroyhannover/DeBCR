@@ -7,7 +7,7 @@
 # *checkpoint*
 # *.h5
 # *.hdf5
-./checkpoint/*
+checkpoint/
 
 ./data/*
 
