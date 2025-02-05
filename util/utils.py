@@ -202,7 +202,7 @@ class DataGenerator:
         
             for index, dataset_name in enumerate(self.data_list):
                 print('Loading dataset:', dataset_name)
-                temp_dataset = np.load(self.data_dir + dataset_name)
+                temp_dataset = np.load(os.path.join(self.data_dir,dataset_name))
                 
                 w_imgs, o_imgs = (
                     temp_dataset['low'],
