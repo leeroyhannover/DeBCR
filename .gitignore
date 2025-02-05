@@ -7,10 +7,9 @@
 # *checkpoint*
 # *.h5
 # *.hdf5
+./checkpoint/*
 
 ./data/*
-
-./util/loss_func.py
 
 *.npz
 
