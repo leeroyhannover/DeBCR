@@ -21,7 +21,7 @@ We prepared multiple resources to help you get started with DeBCR (in order of c
 2. `Google Colab Notebook(s)` - the interactive notebook(s) with accessible GPU resources available online, see the table below (to be extended).
    | Notebooks                                                                                               | Description |
    | :------------------------------------------------------------------------------------------------------ | ----------- |
-   | [DeBCR_train](https://githubtocolab.com/leeroyhannover/DeBCR/blob/main/notebooks/DeBCR_train.ipynb)  | Demostrates DeBCR training data and parameters setup and training process. The example data is available. |
+   | [DeBCR_train](https://githubtocolab.com/leeroyhannover/DeBCR/blob/develop/notebooks/DeBCR_train.ipynb)  | Demostrates DeBCR training data and parameters setup and training process. The example data is available. |
 
 3. `Open-source code` (this GitHub repository) with guidelines on its [Local usage](#local-usage) for training and prediction.
 
