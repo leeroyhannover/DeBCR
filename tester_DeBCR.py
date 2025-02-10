@@ -21,7 +21,8 @@ class MyFormatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawTextHelpFo
 
 def get_test_parser():
     parser = argparse.ArgumentParser(description=(
-        "DeBCR: DL-based denoising, deconvolution and deblurring for light microscopy data."
+        "DeBCR: DL-based denoising, deconvolution and deblurring for light microscopy data.\n"
+        "This is the subtool to predict corrected data from corrupted one using trained DeBCR model."
     ), formatter_class=MyFormatter)
     
     parser.add_argument("--task_type", type=str, default='2D_denoising', choices=['2D_denoising','3D_denoising','bright_SR','confocal_SR'],
@@ -31,11 +32,11 @@ def get_test_parser():
     parser.add_argument("--ckpt_name", type=str, default="ckpt-*",
                         help=("Filename (w/o file extension) of the checkpoint of choice (can be a wildcard as well).\n"
                         "If not provided, the latest (by sorted filename) checkpoint file will be used."))
-    parser.add_argument("--testset_path", type=str, default=None, help="Path to the test datset as a single NPZ file.")
+    parser.add_argument("--input_path", type=str, default=None, help="Path to a single NPZ file or a folder with multiple NPZ files to process, should contain two subsets: \"low\" and \"gt\".")
     parser.add_argument("--save_fig", action="store_true", default=False, help="Flag to enable saving figures of the example test results.")
     parser.add_argument("--fig_path", type=str, default='./figures/', help="Path to save figures of the example test results.")
     parser.add_argument("--results_path", type=str, default='./results/', help="Path to save the test results.")
-    parser.add_argument("--whole_predict", action="store_true", default=False, help="Flag to enable predicting the whole image for certain tasks.")
+    parser.add_argument("--predict_3d", action="store_true", default=False, help="Flag to enable volumetric (3D) prediction.")
     parser.add_argument("--gpu_id", type=int, default=0, help="GPU ID to be used.")
     return parser
 
@@ -76,82 +77,90 @@ def test(args):
     
     ### Test dataset
     # Input directory for testing data
-    #test_dir = args.testset_path
-    #test_list = natsorted(os.listdir(test_dir))
-    #testset_filepath = os.path.join(test_dir, test_list[0])
-
-    testset_filepath = args.testset_path
-    print('testset: ' + testset_filepath)
-    if not os.path.isfile(testset_filepath):
-        raise FileNotFoundError('No such file or directory!')
-    
-    if not args.whole_predict and args.task_type in ['2D_denoising', '3D_denoising', 'bright_SR', 'confocal_SR']:
-        
-        test_raw = np.load(testset_filepath)
-        w_test_img, o_test_img = test_raw['low'], test_raw['gt']
-        w_test_img, o_test_img = np.expand_dims(w_test_img, axis=3), np.expand_dims(o_test_img, axis=3)
-        w_test_img, o_test_img = rescale(w_test_img), rescale(o_test_img)
-        
-        test_w_list, test_o_list = multi_input(w_test_img, o_test_img)
-        pred_test_list = eval_model.predict(test_w_list) 
-        
-    elif args.whole_predict and args.task_type == '3D_denoising':
-        
-        print('predict the whole image')
-        test_raw = np.load(testset_filepath)
-        w_test_img, o_test_img = test_raw['low'], test_raw['gt'] # (45, 1024, 512)
-        patch_predictor = PatchPred_3D_denoiser(eval_model)
-        # pred_result = patch_predictor.pred_one_patch(w_test_img, o_test_img) 
-        stacked_pred_result = patch_predictor.pred_stack_patch(w_test_img, o_test_img) # whole xz
-        
-        # save the xz
-        NUM = 511
-        re_temp_pred, temp_w, temp_o = stacked_pred_result[:, NUM, :], w_test_img[:, NUM, :], o_test_img[:, NUM, :]
-        fig, axes = plt.subplots(1, 3, figsize=(15, 5))
-        axes[0].imshow(re_temp_pred, cmap='inferno')
-        axes[0].set_title('Predicted')
-        axes[0].axis('off')
-        axes[1].imshow(temp_w, cmap='inferno')
-        axes[1].set_title('Input')
-        axes[1].axis('off')
-        axes[2].imshow(temp_o, cmap='inferno')
-        axes[2].set_title('Ground Truth')
-        axes[2].axis('off')
-
-        plt.savefig(args.fig_path + str(args.task_type) + '/comparison_yz.svg', format='svg')
-        plt.close(fig)
-    
+    print(f'Input path: {args.input_path}')
+    if not os.path.exists(args.input_path):
+        raise FileNotFoundError('No such file or directory!')    
     else:
-        print('--whole_predict is not available for {} task type!'.format(args.task_type))
-    
+        if os.path.isfile(args.input_path):    
+            input_list = [args.input_path]
+        elif os.path.isdir(args.input_path):
+            input_list = [args.input_path + os.sep + filename for filename in natsorted(os.listdir(args.input_path))]
+
     results_path = args.results_path
     if not os.path.exists(results_path):
         os.makedirs(results_path)
-
-    pred_test_arr = np.asarray(pred_test_list[0]) 
-    pred_test_arr = np.squeeze(pred_test_arr)
-    np.savez(results_path + '/results.npz', pred=pred_test_arr)
     
-    #####
-    # evaluation by the metrics
-    if not args.whole_predict:
-        pred_test_norm, test_o_norm = rescale(pred_test_list[0]), rescale(test_o_list[0])
-        psnr_value, ssim_value, rmse = metrics(pred_test_norm, test_o_norm)
-        print('Test performance(PSNR, SSIM, RMSE)', psnr_value.round(2), ssim_value.round(2), rmse.round(2))
-    else:
-        print('No metrics for the whole-image predictions yet...')
+    if not args.predict_3d and args.task_type in ['2D_denoising', '3D_denoising', 'bright_SR', 'confocal_SR']:
 
-    # save the results as fig
-    if args.save_fig and not args.whole_predict:
-        # save a random fig under path
-        fig_path = args.fig_path
+        for idx in range(len(input_list)):
+            input_filepath = input_list[idx]
+            test_raw = np.load(input_filepath)
+            w_test_img, o_test_img = test_raw['low'], test_raw['gt']
+            w_test_img, o_test_img = np.expand_dims(w_test_img, axis=3), np.expand_dims(o_test_img, axis=3)
+            w_test_img, o_test_img = rescale(w_test_img), rescale(o_test_img)
+            
+            test_w_list, test_o_list = multi_input(w_test_img, o_test_img)
+            pred_test_list = eval_model.predict(test_w_list) 
+    
+            # evaluation by the metrics
+            pred_test_norm, test_o_norm = rescale(pred_test_list[0]), rescale(test_o_list[0])
+            psnr_value, ssim_value, rmse = metrics(pred_test_norm, test_o_norm)
+            print('Test performance(PSNR, SSIM, RMSE)', psnr_value.round(2), ssim_value.round(2), rmse.round(2))
+
+            pred_test_arr = np.asarray(pred_test_list[0]) 
+            pred_test_arr = np.squeeze(pred_test_arr)
+
+            file_suffix = f'_{idx}' if idx > 0 else ''
+            np.savez(results_path + os.sep + f'results{file_suffix}.npz', pred=pred_test_arr)
+            
+            # save the results as fig
+            if args.save_fig:
+                # save a random fig under path
+                fig_path = args.fig_path
+            
+                if not os.path.exists(fig_path):
+                    os.makedirs(fig_path)
+            
+                eval_results = [psnr_value, ssim_value, rmse]
+                save_grid(pred_test_list[0], test_w_list[0], test_o_list[0], fig_path, f'{args.task_type}{file_suffix}', eval_results)
+                print('Example results figure saved at', fig_path)
+    
+    elif args.predict_3d and args.task_type == '3D_denoising':
         
-        if not os.path.exists(fig_path):
-            os.makedirs(fig_path)
+        print('Predict volume was requested.')
+
+        for idx in range(len(input_list)):
+            input_filepath = input_list[idx]
+            test_raw = np.load(testset_filepath)
+            w_test_img, o_test_img = test_raw['low'], test_raw['gt'] # (45, 1024, 512)
         
-        eval_results = [psnr_value, ssim_value, rmse]
-        save_grid(pred_test_list[0], test_w_list[0], test_o_list[0], fig_path, str(args.task_type), eval_results)
-        print('Example results figure saved at', fig_path)
+            patch_predictor = PatchPred_3D_denoiser(eval_model)
+            # pred_result = patch_predictor.pred_one_patch(w_test_img, o_test_img) 
+            
+            stacked_pred_result = patch_predictor.pred_stack_patch(w_test_img, o_test_img) # whole xz
+            file_suffix = f'_{idx}' if idx > 0 else ''
+            np.savez(results_path + os.sep + f'results{file_suffix}.npz', pred=stacked_pred_result)
+            
+            # save the results as fig
+            if args.save_fig:
+                # save the xz
+                NUM = 511
+                re_temp_pred, temp_w, temp_o = stacked_pred_result[:, NUM, :], w_test_img[:, NUM, :], o_test_img[:, NUM, :]
+                fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+                axes[0].imshow(re_temp_pred, cmap='inferno')
+                axes[0].set_title('Predicted')
+                axes[0].axis('off')
+                axes[1].imshow(temp_w, cmap='inferno')
+                axes[1].set_title('Input')
+                axes[1].axis('off')
+                axes[2].imshow(temp_o, cmap='inferno')
+                axes[2].set_title('Ground Truth')
+                axes[2].axis('off')
+        
+                plt.savefig(args.fig_path + os.sep + f'{args.task_type}{file_suffix}_yz.svg', format='svg')
+                plt.close(fig)
+    else:
+        print('--predict_3d is not available for {} task type!'.format(args.task_type))
 
 def main():
     parser = get_test_parser()
@@ -167,6 +176,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
-# python test_DeBCR.py --microscopy LM --task 2D_denoising --save_fig True
-# python test_DeBCR.py --microscopy LM --task bright_SR --save_fig True
